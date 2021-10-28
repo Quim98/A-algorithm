@@ -7,7 +7,7 @@ typedef struct Node{
     char *name;
     double lat,lon;
     unsigned short int nsucc;
-    unsigned long int *successors;
+    unsigned long int successors[9];
 }node;
 
 
@@ -49,11 +49,11 @@ void put_successor ( node nodes_inf[], unsigned long int source, unsigned long i
     }
 
     // Include memory if needed
-    nodes_inf[source_element].nsucc += 1;
-    if ( nodes_inf[source_element].nsucc > 2 )
-    {
-        nodes_inf[source_element].successors = (unsigned long int*)realloc(nodes_inf[source_element].successors,nodes_inf[source_element].nsucc*sizeof(unsigned long int));
-    }
+    //nodes_inf[source_element].nsucc += 1;
+    // if ( nodes_inf[source_element].nsucc > 2 )
+    // {
+    //     nodes_inf[source_element].successors = (unsigned long int*)realloc(nodes_inf[source_element].successors,nodes_inf[source_element].nsucc*sizeof(unsigned long int));
+    // }
 
     // Add the successor
     nodes_inf[source_element].successors[nodes_inf[source_element].nsucc - 1] = destination;
@@ -110,11 +110,26 @@ int main(int argc, char** argv)
         getline (&buffer, &size, myfile);
         tmp = strdup(buffer);
         sp = &tmp;
-        
-        first = strsep (&buffer,"|");
+
+        if (i % 100000 == 0) // Borrar!!!!!!!!!!!!!
+        { // Borrar!!!!!!!!!!!!!
+            printf("%lu \n",i); // Borrar!!!!!!!!!!!!!
+        } // Borrar!!!!!!!!!!!!!
+    
+        first = strsep (sp,"|");
+
+        if (i % 100000 == 0) // Borrar!!!!!!!!!!!!!
+        { // Borrar!!!!!!!!!!!!!
+            printf("%s \n",first); // Borrar!!!!!!!!!!!!!
+        } // Borrar!!!!!!!!!!!!!        
         
         if ( first == "node" )
         {
+            if (i % 100000 == 0) // Borrar!!!!!!!!!!!!!
+            { // Borrar!!!!!!!!!!!!!
+                printf("Entered a node"); // Borrar!!!!!!!!!!!!!
+            } // Borrar!!!!!!!!!!!!!
+
             node_inf[node_count].id = strtoul(strsep (sp,"|"),&trash,10);
             node_inf[node_count].name = strsep (sp,"|");
             for (j=0;j<7;j++)
@@ -126,15 +141,20 @@ int main(int argc, char** argv)
             node_inf[node_count].nsucc = 0;
             ;
             // We assign a default vector size of 2 by reserving 2 times the memory needed for our data type
-            if ( (node_inf[node_count].successors = (unsigned long int*)malloc(2*sizeof(unsigned long int))) == NULL )
-            {
-                printf("Memory of successors could not be reserved. Exiting the program. \n");
-                return 1;
-            }
-            node_count += 1;
+            // if ( (node_inf[node_count].successors = (unsigned long int*)malloc(2*sizeof(unsigned long int))) == NULL )
+            // {
+            //     printf("Memory of successors could not be reserved. Exiting the program. \n");
+            //     return 1;
+            // }
+            // node_count += 1;
         }
         else if ( first == "way" )
         {
+            if (i % 100000 == 0) // Borrar!!!!!!!!!!!!!
+            { // Borrar!!!!!!!!!!!!!
+                printf("Entered a way"); // Borrar!!!!!!!!!!!!!
+            } // Borrar!!!!!!!!!!!!!
+            
             for (j=0;j<6;j++)
             {
                 trash = strsep (sp,"|"); // Lines that we don't want
