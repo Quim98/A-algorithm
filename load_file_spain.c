@@ -56,7 +56,7 @@ void put_successor ( node nodes_inf[], unsigned long int source, unsigned long i
     }
 
     // Add the successor
-    *(nodes_inf[source_element].successors + (nodes_inf[source_element].nsucc - 1)) = destination;
+    nodes_inf[source_element].successors[nodes_inf[source_element].nsucc - 1] = destination;
     return;
 }
 
@@ -65,7 +65,8 @@ int main(int argc, char** argv)
     FILE *myfile;
     size_t size = 79857;
     char *buffer;
-    int bytes_read;
+    char *tmp;
+    char **sp;
     unsigned long int node_count = 0;
     unsigned long int i;
     unsigned int j;
@@ -107,24 +108,21 @@ int main(int argc, char** argv)
     for (i=3;i<25353791;i++)
     {
         getline (&buffer, &size, myfile);
-        if (i>2000) // Borrar!!!!!!!!!!!!!
-        { // Borrar!!!!!!!!!!!!!
-            printf("Reading line: '%s' \n",buffer); // Borrar!!!!!!!!!!!!!
-            printf("Line above in iteration: %d \n",i); // Borrar!!!!!!!!!!!!!
-        } // Borrar!!!!!!!!!!!!!
+        tmp = strdup(buffer);
+        sp = &tmp;
         
         first = strsep (&buffer,"|");
         
         if ( first == "node" )
         {
-            node_inf[node_count].id = strtoul(strsep (&buffer,"|"),&trash,10);
-            node_inf[node_count].name = strsep (&buffer,"|");
+            node_inf[node_count].id = strtoul(strsep (sp,"|"),&trash,10);
+            node_inf[node_count].name = strsep (sp,"|");
             for (j=0;j<7;j++)
             {
                 trash = strsep(&buffer,"|"); // Lines that we don't want
             }
-            node_inf[node_count].lat = atof(strsep (&buffer,"|"));
-            node_inf[node_count].lon = atof(strsep (&buffer,"|"));
+            node_inf[node_count].lat = atof(strsep (sp,"|"));
+            node_inf[node_count].lon = atof(strsep (sp,"|"));
             node_inf[node_count].nsucc = 0;
             ;
             // We assign a default vector size of 2 by reserving 2 times the memory needed for our data type
@@ -135,36 +133,34 @@ int main(int argc, char** argv)
             }
             node_count += 1;
         }
-        /*
         else if ( first == "way" )
         {
             for (j=0;j<6;j++)
             {
-                trash = strsep (&buffer,"|"); // Lines that we don't want
+                trash = strsep (sp,"|"); // Lines that we don't want
             }
-            if ( (first = strsep (&buffer,"|")) == "oneway" )
+            if ( (first = strsep (sp,"|")) == "oneway" )
             {
-                while ( (first = strsep (&buffer,"|")) != NULL )
+                while ( (first = strsep (sp,"|")) != NULL )
                 {
-                    last = strsep (&buffer,"|");
+                    last = strsep (sp,"|");
                     put_successor ( node_inf, strtoul(first,&trash,10) , strtoul(last,&trash,10) );
                 }
             }
             else
             {
-                while ( (first = strsep (&buffer,"|")) != NULL )
+                while ( (first = strsep (sp,"|")) != NULL )
                 {
-                    last = strsep (&buffer,"|");
+                    last = strsep (sp,"|");
                     put_successor ( node_inf, strtoul(first,&trash,10) , strtoul(last,&trash,10) );
                     put_successor ( node_inf, strtoul(last,&trash,10) , strtoul(first,&trash,10) );
                 }
             }
         }
-        */
     }
     fclose(myfile);
 
-    printf("Prova 6 \n"); // Borrar!!!!!!!!!!!!!
+    printf("Prova 2 \n"); // Borrar!!!!!!!!!!!!!
 
     /*
     for (i=0;i<23895681;i=i+1000000) // See if we have saved the nodes
