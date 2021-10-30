@@ -109,25 +109,21 @@ int main(int argc, char** argv)
     {
         getline (&buffer, &size, myfile);
         tmp = strdup(buffer);
-        sp = &tmp;
-
-        if (i % 100000 == 0) // Borrar!!!!!!!!!!!!!
-        { // Borrar!!!!!!!!!!!!!
-            printf("%lu \n",i); // Borrar!!!!!!!!!!!!!
-        } // Borrar!!!!!!!!!!!!!
-    
+        sp = &tmp;    
         first = strsep (sp,"|");
 
-        if (i % 100000 == 0) // Borrar!!!!!!!!!!!!!
+        /*
+        if (i%1000000 == 0) // Borrar!!!!!!!!!!!!!
         { // Borrar!!!!!!!!!!!!!
             printf("%s \n",first); // Borrar!!!!!!!!!!!!!
-        } // Borrar!!!!!!!!!!!!!        
-        
-        if ( first == "node" )
+        } // Borrar!!!!!!!!!!!!!
+        */
+ 
+        if ( strcmp(first,"node") == 0 )
         {
             if (i % 100000 == 0) // Borrar!!!!!!!!!!!!!
             { // Borrar!!!!!!!!!!!!!
-                printf("Entered a node"); // Borrar!!!!!!!!!!!!!
+                printf("Entered a node \n"); // Borrar!!!!!!!!!!!!!
             } // Borrar!!!!!!!!!!!!!
 
             node_inf[node_count].id = strtoul(strsep (sp,"|"),&trash,10);
@@ -148,13 +144,9 @@ int main(int argc, char** argv)
             // }
             // node_count += 1;
         }
-        else if ( first == "way" )
+        /*
+        else if ( strcmp(first,"way") == 0 )
         {
-            if (i % 100000 == 0) // Borrar!!!!!!!!!!!!!
-            { // Borrar!!!!!!!!!!!!!
-                printf("Entered a way"); // Borrar!!!!!!!!!!!!!
-            } // Borrar!!!!!!!!!!!!!
-            
             for (j=0;j<6;j++)
             {
                 trash = strsep (sp,"|"); // Lines that we don't want
@@ -177,20 +169,20 @@ int main(int argc, char** argv)
                 }
             }
         }
+        */
     }
     fclose(myfile);
 
     printf("Prova 2 \n"); // Borrar!!!!!!!!!!!!!
 
-    /*
+
     for (i=0;i<23895681;i=i+1000000) // See if we have saved the nodes
     {
-        printf("The id of the node is: %d \n",node_inf[i].id);
+        printf("The id of the node is: %lu \n",node_inf[i].id);
         printf("The latitude of the node is: %f \n",node_inf[i].lat);
         printf("The longitude of the node is: %f \n",node_inf[i].lon);
-        printf("The number of successors of the node is: %d \n",node_inf[i].nsucc);
+        // printf("The number of successors of the node is: %lu \n",node_inf[i].nsucc);
     }
-    */
 
 
     return 0;
