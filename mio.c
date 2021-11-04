@@ -109,7 +109,7 @@ int main(int argc, char** argv)
         isrelation = strcmp(first,"relation");
         if (isnode==0)
         {
-            printf("Hello");
+            printf("Hello\n");
             node_inf[node_count].id = strtoul(strsep (&buffer,"|"),&trash,10);
             node_inf[node_count].name = strsep(&buffer,"|");
             j=0;
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
         }
         else if (isway==0)
         {
-            printf("Hello2");
+            printf("Hello2\n");
             j=0;
             for (j=0;j<6;j++)
             {
@@ -239,7 +239,7 @@ int main(int argc, char** argv)
                 } 
             }
         }
-        else if (isrelation==0)
+        else 
         {
             printf("relaaaation");
             break;
