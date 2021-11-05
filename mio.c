@@ -12,20 +12,40 @@ typedef struct{
 
 unsigned long int binary_search ( node nodes_inf[], unsigned long int size_nodes, unsigned long int searched_node )
 {
+    unsigned long int iter = 0;
     unsigned long int high = size_nodes-1;
     unsigned long int low = 0;
-    unsigned long int middle = low + (high - low)/2;
+    unsigned long int middle = high/2;
     while ( nodes_inf[middle].id != searched_node )
     {
         if ( searched_node > nodes_inf[middle].id)
         {
-            low = middle + 1;
+            low = middle + 1; // + 1
             middle = low + (high - low)/2;
+            iter += 1;
         }
         else if ( searched_node < nodes_inf[middle].id)
         {
-            high = middle - 1;
+            high = middle -1; // - 1
             middle = low + (high - low)/2;
+            iter += 1;
+        }
+        printf("Seacrhing from %lu to %lu w/ middle in %lu w/ noide id %lu \n",low,high,middle,nodes_inf[middle].id);//Borrar
+
+        if (low > high) 
+        {
+            printf("Node doesn't exist \n"); //Borrar
+            return 4294967295; //If node is not in the vector we return 0
+        }
+        else if (high == 0)
+        {
+            printf("Node doesn't exist \n"); //Borrar
+            return 4294967295; //If node is not in the vector we return 0
+        }
+        else if (low == (size_nodes-1))
+        {
+            printf("Node doesn't exist \n"); //Borrar
+            return 4294967295; //If node is not in the vector we return 0
         }
     }
     return middle;
@@ -63,11 +83,11 @@ void put_successor ( node nodes_inf[], unsigned long int source, unsigned long i
 
 int main(int argc, char** argv)
 {
-    int isnode, isway, isrelation, isoneway, contador, salir;
+    int isnode, isway, isoneway, contador, salir;
     char *trash;
     char *first;
     unsigned long int node_count = 0;
-    unsigned long int edges[1000], no_existe[1000];
+    unsigned long int edges[1000], current_edge;
     unsigned long int i,h,p;
     unsigned int j,m,n;
     size_t size = 79857;
@@ -100,16 +120,15 @@ int main(int argc, char** argv)
     getline (&buffer, &size, myfile); // Discard first 3 rows
     getline (&buffer, &size, myfile);
     i=3;
-    for (i=3;i<25353790;i++)
+    for (i=4;i<25353790;i++)
     {
         getline (&buffer, &size, myfile);
         first = strsep (&buffer,"|");
         isnode = strcmp(first,"node");
         isway = strcmp(first,"way");
-        isrelation = strcmp(first,"relation");
         if (isnode==0)
         {
-            printf("Hello\n");
+            // printf("Node entered in i=%lu \n",i); // Borrar
             node_inf[node_count].id = strtoul(strsep (&buffer,"|"),&trash,10);
             node_inf[node_count].name = strsep(&buffer,"|");
             j=0;
@@ -131,7 +150,7 @@ int main(int argc, char** argv)
         }
         else if (isway==0)
         {
-            printf("Hello2\n");
+            printf("Way entered in i=%lu \n",i); // Borrar
             j=0;
             for (j=0;j<6;j++)
             {
@@ -141,111 +160,77 @@ int main(int argc, char** argv)
             isoneway = strcmp(first,"oneway");
             if (isoneway==0)
             {
+                printf("Is one way \n");
                 trash = strsep (&buffer,"|");
                 first = strsep (&buffer,"|");
                 contador = 0;
                 salir = 0;
                 while (first != NULL)
-                {
-                    contador = contador + 1;                
-                    edges[contador-1]=strtoul(first,&trash,10);
-                    h=0;
-                    for (h=0;h<23895681;h++)
+                {            
+                    current_edge=strtoul(first,&trash,10); 
+                    printf("Current edge computed is %lu \n",current_edge);
+                    printf("%lu \n",binary_search ( node_inf, 23895681, current_edge)); // Borrar
+                    printf("We go to if \n");
+                    if (binary_search ( node_inf, 23895681, current_edge) != 4294967295)
                     {
-                        if (node_inf[h].id == edges[contador-1])
-                        {
-                            no_existe[contador-1] = 0;
-                            break;
-                        }
-                        else
-                        {
-                            no_existe[contador-1] = 1;
-                        }
+                        edges[contador]=current_edge;
+                        printf("Adding edge %lu in position %d \n",current_edge,contador); // Borrar
+                        contador = contador + 1;
                     }
                     first = strsep (&buffer,"|");
-                }
-                m=0;
-                for (m=0;m<contador;m++)
+                }       
+                if (contador > 1)
                 {
-                    if (no_existe[m]==1)
+                    printf("pasa"); // Borrar
+                    for (n=0;n<(contador-1);n=n+1)
                     {
-                        salir = salir+1;
+                        printf("Adding edge from %lu to %lu \n",edges[n],edges[n+1]); // Borrar
+                        put_successor ( node_inf, edges[n] , edges[n+1] );
                     }
                 }
-                if (salir==0)
-                {
-                    if (contador > 2)
-                    {
-                        if ((contador%2)==0)
-                        {
-                            n=0;
-                            for (n=0;n<contador;n=n+2)
-                            {
-                                printf("pasa");
-                                put_successor ( node_inf, edges[n] , edges[n+1] );
-                            }
-                        }
-                    }
-                } 
             }
             else
             {
+                printf("Is not one way \n");
                 trash = strsep (&buffer,"|");
                 first = strsep (&buffer,"|");
                 contador = 0;
                 salir = 0;
                 while (first != NULL)
-                {
-                    contador = contador + 1;                
-                    edges[contador-1]=strtoul(first,&trash,10);
-                    h=0;
-                    for (h=0;h<23895681;h++)
+                {            
+                    current_edge=strtoul(first,&trash,10);
+                    printf("Current edge computed is %lu \n",current_edge);
+                    printf("%lu \n",binary_search ( node_inf, 23895681, current_edge)); // Borrar
+                    printf("We go to if \n");
+                    if (binary_search (node_inf, 23895681, current_edge) != 4294967295)
                     {
-                        if (node_inf[h].id == edges[contador-1])
-                        {
-                            no_existe[contador-1] = 0;
-                            break;
-                        }
-                        else
-                        {
-                            no_existe[contador-1] = 1;
-                        }
+                        edges[contador]=current_edge;
+                        printf("Adding edge %lu in position %d \n",current_edge,contador); // Borrar
+                        contador = contador + 1;
                     }
                     first = strsep (&buffer,"|");
-                }
-                m=0;
-                for (m=0;m<contador;m++)
+                    printf("We go to new element \n");
+                }      
+                if (contador > 1)
                 {
-                    if (no_existe[m]==1)
+                    printf("pasa"); // Borrar
+                    for (n=0;n<(contador-1);n=n+1)
                     {
-                        salir = salir+1;
+                        printf("Adding edge from %lu to %lu \n",edges[n],edges[n+1]); // Borrar
+                        put_successor ( node_inf, edges[n] , edges[n+1] );
+                        printf("Adding edge from %lu to %lu \n",edges[n+1],edges[n]); // Borrar
+                        put_successor ( node_inf, edges[n+1] , edges[n] );
                     }
                 }
-                if (salir==0)
-                {
-                    if (contador > 2)
-                    {
-                        if ((contador%2)==0)
-                        {
-                            n=0;
-                            for (n=0;n<contador;n=n+2)
-                            {
-                                printf("pasa");
-                                put_successor ( node_inf, edges[n] , edges[n+1] );
-                                put_successor ( node_inf, edges[n+1] , edges[n] );
-                            }
-                        }
-                    }
-                } 
             }
         }
-        else 
+        else
         {
-            printf("relaaaation");
+            printf("Relation entered in i=%lu \n",i); // Borrar
             break;
         }
     }
-    printf("se acabo el file");
+    printf("se acabo el file"); // Borrar
     p=0;
     for (p=0;p<23895681;p=p+10000) // See if we have saved the nodes
     {
