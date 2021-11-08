@@ -14,26 +14,33 @@ unsigned long int binary_search ( node nodes_inf[], unsigned long int size_nodes
 {
     unsigned long int high = size_nodes-1;
     unsigned long int low = 0;
-    unsigned long int middle = low + (high - low)/2;
+    unsigned long int middle = high/2;
     while ( nodes_inf[middle].id != searched_node )
     {
-        while (low<=high){
-            if ( searched_node > nodes_inf[middle].id)
-            {
-                low = middle + 1;
-                middle = low + (high - low)/2;
-            }
-            else if ( searched_node < nodes_inf[middle].id)
-            {
-                high = middle - 1;
-                middle = low + (high - low)/2;
-            }
-        }
-        if (low>high)
+        if ( searched_node > nodes_inf[middle].id)
         {
-            middle = 4294967294;
-            return middle;
-        } 
+            low = middle + 1;
+            middle = low + (high - low)/2;
+        }
+        else if ( searched_node < nodes_inf[middle].id)
+        {
+            high = middle -1;
+            middle = low + (high - low)/2;
+            
+        }
+        low=low;
+        if (low > high) 
+        {
+            return 4294967295; 
+        }
+        else if (high == 0)
+        {
+            return 4294967295;
+        }
+        else if (low == (size_nodes-1))
+        {
+            return 4294967295;
+        }
     }
     return middle;
 }
@@ -41,7 +48,7 @@ unsigned long int binary_search ( node nodes_inf[], unsigned long int size_nodes
 void put_successor ( node nodes_inf[], unsigned long int source, unsigned long int destination )
 {
     unsigned long int source_element, vector;
-    unsigned int k;
+    unsigned int k=0;
     unsigned long int size_nodes = 23895681;
     // Search the element of the source node
     source_element = binary_search ( nodes_inf, size_nodes, source );
@@ -62,7 +69,6 @@ void put_successor ( node nodes_inf[], unsigned long int source, unsigned long i
     {
         nodes_inf[source_element].successors = (unsigned long int*)realloc(nodes_inf[source_element].successors,nodes_inf[source_element].nsucc*sizeof(unsigned long int));
     }
-
     // Add the successor
     nodes_inf[source_element].successors[nodes_inf[source_element].nsucc - 1] = destination;
     return;
@@ -70,13 +76,13 @@ void put_successor ( node nodes_inf[], unsigned long int source, unsigned long i
 
 int main(int argc, char** argv)
 {
-    int isnode, isway, isrelation, isoneway, contador, name;
+    int isnode, isway, isoneway, contador;
     char *trash;
     char *first;
     unsigned long int node_count = 0;
-    unsigned long int edges[2000];
+    unsigned long int edges[10000], current_edge;
     unsigned long int i,h,p;
-    unsigned int j,n;
+    unsigned int j,m,n;
     size_t size = 79857;
     char *buffer = (char*) malloc (size*sizeof(char));
     if (buffer == NULL)
@@ -102,20 +108,20 @@ int main(int argc, char** argv)
     {
         printf ("Success at loading the file. \n");
     }
+
     getline (&buffer, &size, myfile);
     getline (&buffer, &size, myfile); // Discard first 3 rows
     getline (&buffer, &size, myfile);
-    for (i=3;i<25353790;i++)
+    i=3;
+    for (i=4;i<25353790;i++)
     {
         getline (&buffer, &size, myfile);
         first = strsep (&buffer,"|");
         isnode = strcmp(first,"node");
         isway = strcmp(first,"way");
-        isrelation = strcmp(first,"relation");
         if (isnode==0)
         {
             node_inf[node_count].id = strtoul(strsep (&buffer,"|"),&trash,10);
-            printf("NODE ");
             node_inf[node_count].name = strsep(&buffer,"|");
             for (j=0;j<6;j++)
             {
@@ -128,14 +134,12 @@ int main(int argc, char** argv)
             node_inf[node_count].successors = (unsigned long int*)malloc(2*sizeof(unsigned long int));
             if ( node_inf[node_count].successors == NULL )
             {
-                printf("Memory of successors could not be reserved. Exiting the program. \n");
                 return 1;
             }
             node_count += 1;
         }
         else if (isway==0)
         {
-            printf("WAY ");
             for (j=0;j<6;j++)
             {
                 trash = strsep (&buffer,"|"); // Lines that we don't want
@@ -146,68 +150,67 @@ int main(int argc, char** argv)
             {
                 trash = strsep (&buffer,"|");
                 first = strsep (&buffer,"|");
-                name = strtoul(first,&trash,10);
                 contador = 0;
                 while (first != NULL)
-                {
-                    if (binary_search ( node_inf, 23895681, name ) != 4294967294)
+                {            
+                    current_edge=strtoul(first,&trash,10);
+                    if (binary_search ( node_inf, 23895681, current_edge) != 4294967295)
                     {
+                        edges[contador]=current_edge;
                         contador = contador + 1;
-                        edges[contador-1]= name;
-                        break;
                     }
                     first = strsep (&buffer,"|");
-                }
+                }    
                 if (contador > 1)
                 {
-                    for (n=0;n<contador-1;n=n+1)
+                    for (n=0;n<(contador-1);n=n+1)
                     {
-                        printf("pasa");
                         put_successor ( node_inf, edges[n] , edges[n+1] );
                     }
-                } 
+                }
             }
             else
             {
                 trash = strsep (&buffer,"|");
                 first = strsep (&buffer,"|");
-                name = strtoul(first,&trash,10);
                 contador = 0;
                 while (first != NULL)
-                {
-                    if (binary_search ( node_inf, 23895681, name ) != 4294967294)
+                {            
+                    current_edge=strtoul(first,&trash,10);
+                    if (binary_search (node_inf, 23895681, current_edge) != 4294967295)
                     {
+                        edges[contador]=current_edge;
                         contador = contador + 1;
-                        edges[contador-1]= name;
-                        break;
                     }
                     first = strsep (&buffer,"|");
-                }
+                }   
                 if (contador > 1)
                 {
-                    for (n=0;n<contador-1;n=n+1)
+                    for (n=0;n<(contador-1);n=n+1)
                     {
-                        printf("pasa");
                         put_successor ( node_inf, edges[n] , edges[n+1] );
                         put_successor ( node_inf, edges[n+1] , edges[n] );
                     }
-                } 
+                }
             }
         }
-        else 
+        else
         {
-            printf("relaaaation");
             break;
         }
     }
-    printf("se acabo el file");
+    printf("se acabo el file"); // Borrar
+    p=0;
     for (p=0;p<23895681;p=p+10000) // See if we have saved the nodes
     {
         printf("The id of the node is: %lu \n",node_inf[p].id);
-        printf("The latitude of the node is: %f \n",node_inf[p].lat);
-        printf("The longitude of the node is: %f \n",node_inf[p].lon);
-        printf("The number of successors of the node is: %i \n",node_inf[p].nsucc);
-        //printf("The successors numer 1 of the node is: %lu \n",node_inf[i].successors[0]);
+        printf("The latitude of the node is: %lf \n",node_inf[p].lat);
+        printf("The longitude of the node is: %lf \n",node_inf[p].lon);
+        printf("The number of successors of the node is: %d \n",node_inf[p].nsucc);
+        if (node_inf[p].nsucc > 1)
+        {
+            printf("Successors number 1 and 2: %lu, %lu \n",node_inf[p].successors[0],node_inf[p].successors[1]);
+        }
     }
     fclose(myfile);
     return 0;
