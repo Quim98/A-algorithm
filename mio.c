@@ -10,6 +10,14 @@ typedef struct{
     unsigned long int *successors;
 }node;
 
+void ExitError(const char *miss, int errcode)
+{
+    fprintf (stderr, "nnERROR: %s.nnStopping...nnnn", miss); 
+    exit(errcode);
+}
+
+
+
 unsigned long int binary_search ( node nodes_inf[], unsigned long int size_nodes, unsigned long int searched_node )
 {
     unsigned long int high = size_nodes-1;
@@ -22,13 +30,12 @@ unsigned long int binary_search ( node nodes_inf[], unsigned long int size_nodes
             low = middle + 1;
             middle = low + (high - low)/2;
         }
-        else if ( searched_node < nodes_inf[middle].id)
+        else
         {
             high = middle -1;
             middle = low + (high - low)/2;
             
         }
-        low=low;
         if (low > high) 
         {
             return 4294967295; 
@@ -199,19 +206,57 @@ int main(int argc, char** argv)
             break;
         }
     }
-    printf("se acabo el file"); // Borrar
-    p=0;
-    for (p=0;p<23895681;p=p+10000) // See if we have saved the nodes
+    printf("File reading finished. \n"); 
+    fclose(myfile);
+    
+    FILE *fin;
+    unsigned long nnodes = 23895681UL;
+    char name[257];
+
+    // Computing the total number of successors
+    unsigned long ntotnsucc=0UL;
+    for(i=0; i < nnodes; i++)
     {
-        printf("The id of the node is: %lu \n",node_inf[p].id);
-        printf("The latitude of the node is: %lf \n",node_inf[p].lat);
-        printf("The longitude of the node is: %lf \n",node_inf[p].lon);
-        printf("The number of successors of the node is: %d \n",node_inf[p].nsucc);
-        if (node_inf[p].nsucc > 1)
+        ntotnsucc += node_inf[i].nsucc;
+    }
+
+    printf("Works here 1\n"); // Borrar
+
+    // Setting the name of the binary file 
+    strcpy(name, "spain.csv");
+    strcpy(strrchr(name, '.'), ".bin");
+
+    printf("Works here 2\n"); // Borrar
+
+    if ((fin = fopen (name, "wb")) == NULL)
+    {
+        ExitError("the output binary data file cannot be opened", 31);
+    }
+
+    // Global data --- header 
+    if( fwrite(&nnodes, sizeof(unsigned long), 1, fin) + fwrite(&ntotnsucc, sizeof(unsigned long), 1, fin) != 2 )
+    {
+        ExitError("when initializing the output binary data file", 32);
+    }
+    // Writing all nodes
+    if( fwrite(node_inf, sizeof(node), nnodes, fin) != nnodes )
+    {
+        ExitError("when writing nodes to the output binary data file", 32);
+    }
+
+    // Writing sucessors in blocks
+    for(i=0; i < nnodes; i++) 
+    {
+        if(node_inf[i].nsucc)
         {
-            printf("Successors number 1 and 2: %lu, %lu \n",node_inf[p].successors[0],node_inf[p].successors[1]);
+            if( fwrite(node_inf[i].successors, sizeof(unsigned long), node_inf[i].nsucc, fin) != node_inf[i].nsucc)
+            {
+                ExitError("when writing edges to the output binary data file", 32);
+            }
+        
         }
     }
-    fclose(myfile);
+    fclose(fin);
+    
     return 0;
 }
