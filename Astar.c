@@ -142,9 +142,10 @@ int main(int argc, char** argv)
     current_node = binary_search ( node_inf, nnodes , 240949599);
     final_node = binary_search ( node_inf, nnodes , 195977239);
     status[current_node].g = 0;
-    status[current_node].h = distance(node_inf[current_node].lat, node_inf[current_node].lon, node_inf[final_node].lat, node_inf[final_node].lon);
+    status[current_node].h = 1.1552 * distance(node_inf[current_node].lat, node_inf[current_node].lon, node_inf[final_node].lat, node_inf[final_node].lon);
     status[current_node].whq = CLOSED;
-    parent_node = current_node;   
+    parent_node = current_node;
+    printf("Distance to objective: %lf \n",status[parent_node].h);
     
     // While we don't find the final node
     while (parent_node != final_node)
