@@ -40,14 +40,17 @@ unsigned long int binary_search ( node nodes_inf[], unsigned long int size_nodes
         {
             return 4294967295; 
         }
-        else if (high == 0)
-        {
-            return 4294967295;
-        }
-        else if (low == (size_nodes-1))
-        {
-            return 4294967295;
-        }
+        else if (nodes_inf[middle].id != searched_node)
+        {    
+            if (high == 0)
+            {
+                return 4294967295;
+            }
+            else if (low == (size_nodes-1))
+            {
+                return 4294967295;
+            }
+        }  
     }
     return middle;
 }
@@ -212,21 +215,79 @@ int main(int argc, char** argv)
     FILE *fin;
     unsigned long nnodes = 23895681UL;
     char name[257];
+    
+    unsigned long int n0 = 0UL;// Borrar
+    unsigned long int n1,n2,n3,n4,n5,n6,n7,n8,n9 = 0UL;// Borrar
+    
 
     // Computing the total number of successors
     unsigned long ntotnsucc=0UL;
     for(i=0; i < nnodes; i++)
     {
         ntotnsucc += node_inf[i].nsucc;
+        // Borrar cap a avall
+        if (node_inf[i].nsucc == 0)
+        {
+            n0+=1;
+        }
+        else if (node_inf[i].nsucc == 1)
+        {
+            n1+=1;
+        }
+        else if (node_inf[i].nsucc == 2)
+        {
+            n2+=1;
+        }
+        else if (node_inf[i].nsucc == 3)
+        {
+            n3+=1;
+        }
+        else if (node_inf[i].nsucc == 4)
+        {
+            n4+=1;
+        }
+        else if (node_inf[i].nsucc == 5)
+        {
+            n5+=1;
+        }
+        else if (node_inf[i].nsucc == 6)
+        {
+            n6+=1;
+        }
+        else if (node_inf[i].nsucc == 7)
+        {
+            n7+=1;
+        }
+        else if (node_inf[i].nsucc == 8)
+        {
+            n8+=1;
+        }
+        else
+        {
+            n9+=1;
+        }
+        // Borrar cap a dalt
     }
 
-    printf("Works here 1\n"); // Borrar
+    printf("Total number of successors: %lu \n",ntotnsucc);
+    printf("Iterator: %lu \n",i);
+    printf("Total number of nodes valence 0: %lu \n",n0);
+    printf("Total number of nodes valence 1: %lu \n",n1);
+    printf("Total number of nodes valence 2: %lu \n",n2);
+    printf("Total number of nodes valence 3: %lu \n",n3);
+    printf("Total number of nodes valence 4: %lu \n",n4);
+    printf("Total number of nodes valence 5: %lu \n",n5);
+    printf("Total number of nodes valence 6: %lu \n",n6);
+    printf("Total number of nodes valence 7: %lu \n",n7);
+    printf("Total number of nodes valence 8: %lu \n",n8);
+    printf("Total number of nodes valence 9: %lu \n",n9);
+    printf("Valence node 0: %lu \n",node_inf[0].nsucc);
+    printf("Valence last node: %lu \n",node_inf[nnodes-1].nsucc);
+    
 
     // Setting the name of the binary file 
     strcpy(name, "spain.csv");
     strcpy(strrchr(name, '.'), ".bin");
-
-    printf("Works here 2\n"); // Borrar
 
     if ((fin = fopen (name, "wb")) == NULL)
     {
