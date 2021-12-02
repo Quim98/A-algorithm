@@ -1,4 +1,4 @@
-int Astar()
+int Astar(unsigned long int initial_id, unsigned long int final_id)
 {
     typedef struct{
     unsigned long int id;
@@ -19,15 +19,17 @@ int Astar()
 
     struct node_l{
         unsigned long int element;
+        double cost;
         struct node_l* next;
     };
     typedef struct node_l node_list;
 
-    node_list *create_new_node(unsigned long int elem)
+    node_list *create_new_node(unsigned long int elem, double cost_node)
     {
         node_list *new = malloc(sizeof(node_list));
         new -> element = elem;
         new -> next = NULL;
+        new -> cost = cost_node;
         return new;
     }
 
@@ -37,11 +39,11 @@ int Astar()
         return elem;
     }
 
-    void insert_at_middle(node_list *head, node_list *elem, double cost_elem, AStarStatus stat[])
+    void insert_at_middle(node_list *head, node_list *elem, AStarStatus stat[])
     {
         node_list *temp = head;
         node_list *temp_old;
-        while ((stat[temp -> element].g + stat[temp -> element].h) <= cost_elem)
+        while ((temp -> cost) <= (elem -> cost))
         {
             temp_old = temp;
             temp = temp_old -> next;
@@ -127,13 +129,13 @@ int Astar()
         return middle;
     }
 
-
+    printf("Loading data from binary file. \n");
     FILE *fin;
     unsigned long nnodes;
     node *node_inf;
     unsigned long int ntotnsucc=46181625;
     unsigned long int *allsuccessors;
-    unsigned long int i,j;
+    unsigned long int i;
     
     //LOADING DATA FROM BINARY FILE
 
@@ -175,7 +177,7 @@ int Astar()
     AStarStatus *status = (AStarStatus*)malloc(nnodes*sizeof(AStarStatus));
     if (status == NULL)
     {
-        printf("Memory of Astar status  could not be reserved. Exiting the program. \n");
+        printf("Memory of Astar status could not be reserved. Exiting the program. \n");
         return 1;
     }
 
@@ -191,22 +193,22 @@ int Astar()
     }
 
     // A* ALGORITHM
+    printf("Binary file data loading finished. Astar algorithm begins. \n");
     unsigned long int open_n_elem = 1;
-    unsigned long int current_node, final_node, parent_node, list_iterator, new_succ;
+    unsigned long int current_node, final_node, parent_node;
     node_list *tmp;
     node_list *open_head;
     node_list *problem; //BORRAR
     unsigned short int prob_happened = 0;
 
     // Add initial node to closed list
-    current_node = binary_search ( node_inf, nnodes , 240949599);
-    final_node = binary_search ( node_inf, nnodes , 195977239);
+    current_node = binary_search ( node_inf, nnodes , initial_id);
+    final_node = binary_search ( node_inf, nnodes , final_id);
     status[current_node].g = 0;
     status[current_node].h = distance(node_inf[current_node].lat, node_inf[current_node].lon, node_inf[final_node].lat, node_inf[final_node].lon);
     status[current_node].whq = OPEN;
-    tmp = create_new_node(current_node);
+    tmp = create_new_node(current_node, (status[current_node].g+status[current_node].h));
     open_head = tmp;
-    printf("Distance to objective: %lf \n",status[current_node].h);
     
     // While we don't find the final node
     while (open_n_elem != 0)
@@ -216,77 +218,68 @@ int Astar()
         parent_node = open_head -> element;
         open_head = eliminate_head(open_head);
         status[parent_node].whq = CLOSED;
-        //printf("Cost of parent node: %lf \n",(status[parent_node].g + status[parent_node].h));
 
         // If final node in closed list, break
         if (parent_node == final_node)
         {
+            printf("Final distance is: %lf \n",status[parent_node].g);
             break;
         }
-
-        new_succ = 0; //BORRAR
 
         // For the successors in the parent node
         for (i=0;i<node_inf[parent_node].nsucc;i++)
         {
             // Save the location of the successor node in the vectors: node_inf, status, open_queue (same for all 3)
-            current_node = binary_search ( node_inf, nnodes , node_inf[parent_node].successors[i]);
-            // If the node is already in the open list (OPEN) vs it's not (NONE). If the successor
-            // node is in the closed list we do nothing
-            //printf("Enter new successor in pos %lu \n",current_node);
-            //printf("Number of elements in open: %lu \n", open_n_elem);
+            current_node = node_inf[parent_node].successors[i];
+            // If the node is already in the open list (OPEN) vs it's not (NONE)
+            // If the successor node is in the closed list we do nothing
             if (status[current_node].whq == OPEN)
             {
                 // We only do something if the new cost for the node is lower
                 if (status[current_node].g > (status[parent_node].g + distance(node_inf[current_node].lat, node_inf[current_node].lon, node_inf[parent_node].lat, node_inf[parent_node].lon)))
                 {
                     // Update cost and parents
-                    //printf("Node already in open list and better cost \n");
                     status[current_node].g = status[parent_node].g + distance(node_inf[current_node].lat, node_inf[current_node].lon, node_inf[parent_node].lat, node_inf[parent_node].lon);
                     status[current_node].parent = parent_node;
 
                     // Dequeue and enqueue of the node
 
-                    // If the successor node is the head of the queue and now it has 
-                    // a better cost we update the cost above and do nothing
                     if (current_node != (open_head -> element))
                     {
-                        //printf("Before eliminated node in middle \n");
                         eliminate_at_middle(open_head, current_node);
-                        //printf("Eliminated node in middle \n");
 
-                        //printf("Eliminated node \n");
                         // Enqueue
-                        tmp = create_new_node(current_node);
+                        tmp = create_new_node(current_node, (status[current_node].g+status[current_node].h));
                         // If we need to change the linked list head
-                        if ((status[open_head -> element].g + status[open_head -> element].h) >= (status[current_node].g + status[current_node].h))
+                        if ((open_head -> cost) >= (tmp -> cost))
                         {
-                            //printf("Before eliminated node and put new head \n");
                             open_head = insert_at_head(open_head, tmp);
-                            //printf("Eliminated node and put new head \n");
                         }
                         else
                         {
-                            //printf("Before eliminated node and put node in open list \n");
-                            insert_at_middle(open_head, tmp, (status[current_node].g + status[current_node].h), status);
-                            //printf("Eliminated node and put node in open list \n");
+                            insert_at_middle(open_head, tmp, status);
                         }
+                    }
+                    else
+                    {
+                        // If the successor node is the head of the queue and now it has 
+                        // a better cost we update the cost and do nothing
+                        open_head -> cost = status[current_node].g + status[current_node].h;
                     }
                 }
             }
             else if (status[current_node].whq == NONE)
             {
-                //printf("Enter new node \n");
-                new_succ += 1; //BORRAR
                 // Update cost and parents
                 status[current_node].g = status[parent_node].g + distance(node_inf[current_node].lat, node_inf[current_node].lon, node_inf[parent_node].lat, node_inf[parent_node].lon);
                 status[current_node].h = distance(node_inf[current_node].lat, node_inf[current_node].lon, node_inf[final_node].lat, node_inf[final_node].lon);
                 status[current_node].parent = parent_node;
                 status[current_node].whq = OPEN;
 
-                tmp = create_new_node(current_node);
-                //printf("Created new node \n");
+                tmp = create_new_node(current_node, (status[current_node].g+status[current_node].h));
+
                 // Enqueue
+
                 // If there are no elements in the open queue the successor will be the head
                 if (open_n_elem == 0)
                 {
@@ -296,25 +289,59 @@ int Astar()
                 else
                 {
                     open_n_elem += 1;
-                    //printf("Updated number of elements \n");
                     // If we need to change the linked list head
-                    if ((status[open_head -> element].g + status[open_head -> element].h) >= (status[current_node].g + status[current_node].h))
+                    if ((open_head -> cost) >= (tmp -> cost))
                     {
-                        //printf("Before put new head \n");
                         open_head = insert_at_head(open_head, tmp);
-                        //printf("Put new head \n");
                     }
                     else
                     {
-                        //printf("Before put node in open list \n"); // PETA AQUI (genera infinite loop perque el node 343686 s'apunta a si mateix amb mateixa memoria)
-                        insert_at_middle(open_head, tmp, (status[current_node].g + status[current_node].h), status);
-                        //printf("Put node in open list \n");
+                        insert_at_middle(open_head, tmp, status);
                     }
                 }
             }
         }
     }
-    printf("Final distance is: %lf \n",status[parent_node].g);
-    
-    return 0;
+    if (parent_node == final_node)
+    {
+        // If the search is successful we create the output file with the path
+        unsigned long int list_iterator;
+        unsigned long int path_number = 1;
+        unsigned long int *path = malloc(sizeof(unsigned long int));
+        FILE *final_file;
+        char name[257];
+        strcpy(name, "path.csv");
+        final_file = fopen(name,"wb");
+        if (final_file == NULL)
+        {
+            printf("Failure at creating file path.csv created. Exiting the program. \n");
+            return 0;
+        }
+
+        fprintf(final_file,"Node ID,Distance from beggining,Latitude,Longitude \n");
+        
+        current_node = binary_search ( node_inf, nnodes , initial_id); //Initial node
+        list_iterator = final_node;
+        path[path_number-1] = list_iterator;
+        while (list_iterator != current_node)
+        {
+            list_iterator = status[list_iterator].parent;
+            path_number += 1;
+            path = (unsigned long int*)realloc(path,path_number*sizeof(unsigned long int));
+            path[path_number-1] = list_iterator;
+        }
+
+        for(i=path_number; i>0;i-=1)
+        {
+            fprintf(final_file,"%lu,%lf,%lf,%lf\n", node_inf[path[i-1]].id, status[path[i-1]].g, node_inf[path[i-1]].lat, node_inf[path[i-1]].lon);
+        }
+        fclose(final_file);
+        printf("File path.csv created. Exiting the program. \n");
+        return 0;
+    }
+    else
+    {
+        printf("Final node not found. Exiting the program. \n");
+        return 1;
+    }
 }

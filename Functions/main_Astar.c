@@ -6,7 +6,7 @@
     #include "Astar.h"
 void main()
 {
-    load_data ();
-    Astar();
+    load_data();
+    Astar(240949599,195977239);
     return;
 }

@@ -53,16 +53,15 @@ int load_data ()
 
     void put_successor ( node nodes_inf[], unsigned long int source, unsigned long int destination )
     {
-        unsigned long int source_element, vector;
+        unsigned long int vector;
         unsigned int k=0;
         unsigned long int size_nodes = 23895681;
         // Search the element of the source node
-        source_element = binary_search ( nodes_inf, size_nodes, source );
 
         // Search if the destination node is already in the vector
-        for (k=0;k<nodes_inf[source_element].nsucc;k++)
+        for (k=0;k<nodes_inf[source].nsucc;k++)
         {
-            vector = nodes_inf[source_element].successors[k];
+            vector = nodes_inf[source].successors[k];
             if (vector==destination)
             {
                 return;
@@ -70,13 +69,13 @@ int load_data ()
         }
 
         // Include memory if needed
-        nodes_inf[source_element].nsucc += 1;
-        if ( nodes_inf[source_element].nsucc > 2 )
+        nodes_inf[source].nsucc += 1;
+        if ( nodes_inf[source].nsucc > 2 )
         {
-            nodes_inf[source_element].successors = (unsigned long int*)realloc(nodes_inf[source_element].successors,nodes_inf[source_element].nsucc*sizeof(unsigned long int));
+            nodes_inf[source].successors = (unsigned long int*)realloc(nodes_inf[source].successors,nodes_inf[source].nsucc*sizeof(unsigned long int));
         }
         // Add the successor
-        nodes_inf[source_element].successors[nodes_inf[source_element].nsucc - 1] = destination;
+        nodes_inf[source].successors[nodes_inf[source].nsucc - 1] = destination;
         return;
     }
 
@@ -156,9 +155,9 @@ int load_data ()
                 first = strsep (&buffer,"|");
                 contador = 0;
                 while (first != NULL)
-                {            
-                    current_edge=strtoul(first,&trash,10);
-                    if (binary_search ( node_inf, 23895681, current_edge) != 4294967295)
+                {          
+                    current_edge = binary_search ( node_inf, 23895681, strtoul(first,&trash,10));
+                    if (current_edge != 4294967295)
                     {
                         edges[contador]=current_edge;
                         contador = contador + 1;
@@ -179,9 +178,9 @@ int load_data ()
                 first = strsep (&buffer,"|");
                 contador = 0;
                 while (first != NULL)
-                {            
-                    current_edge=strtoul(first,&trash,10);
-                    if (binary_search (node_inf, 23895681, current_edge) != 4294967295)
+                {        
+                    current_edge = binary_search ( node_inf, 23895681, strtoul(first,&trash,10));
+                    if (current_edge != 4294967295)
                     {
                         edges[contador]=current_edge;
                         contador = contador + 1;
@@ -203,7 +202,7 @@ int load_data ()
             break;
         }
     }
-    printf("File reading finished. \n"); 
+    printf("File reading finished. Generating binary file. \n"); 
     fclose(myfile);
     
     FILE *fin;
@@ -254,6 +253,7 @@ int load_data ()
         }
     }
     fclose(fin);
+    printf("Binary file generated. \n"); 
     
     return 0;
 }
