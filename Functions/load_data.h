@@ -120,16 +120,19 @@ int load_data ()
     {
         getline (&buffer, &size, myfile);
         first = strsep (&buffer,"|");
-        isnode = strcmp(first,"node");
-        isway = strcmp(first,"way");
+        isnode = strcmp(first,"node"); // If the line that we are reading is a node the variable isnode = 0
+        isway = strcmp(first,"way"); // If the line that we are reading is a way the variable isway = 0
         if (isnode==0)
         {
+            // Save the id and name of the node
             node_inf[node_count].id = strtoul(strsep (&buffer,"|"),&trash,10);
             node_inf[node_count].name = strsep(&buffer,"|");
+
             for (j=0;j<6;j++)
             {
-                trash = strsep(&buffer,"|"); // Lines that we don't want
+                trash = strsep(&buffer,"|"); // Columns that we don't want
             }
+
             node_inf[node_count].lat = atof(strsep (&buffer,"|"));
             node_inf[node_count].lon = atof(strsep (&buffer," "));
             node_inf[node_count].nsucc = 0;
@@ -137,6 +140,7 @@ int load_data ()
             node_inf[node_count].successors = (unsigned long int*)malloc(2*sizeof(unsigned long int));
             if ( node_inf[node_count].successors == NULL )
             {
+                printf("Error at assigning memory in a successors vector. Exiting the program. \n");
                 return 1;
             }
             node_count += 1;

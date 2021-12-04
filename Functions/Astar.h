@@ -85,11 +85,10 @@ int Astar(unsigned long int initial_id, unsigned long int final_id)
 
     double distance (double lat_i, double lon_i, double lat_f, double lon_f)
     {
-        double a,c;
-
-        a = sin(M_PI/180*(lat_f-lat_i)/2)*sin(M_PI/180*(lat_f-lat_i)/2)+cos(M_PI/180*lat_i)*cos(M_PI/180*lat_f)*sin(M_PI/180*(lon_f-lon_i)/2)*sin(M_PI/180*(lon_f-lon_i)/2);
-        c = 2 * atan2(sqrt(a), sqrt(1-a));
-        return 6371007.1810*c;
+        double x,y;
+        x = M_PI/180*(lon_f - lon_i) * cos(M_PI/180*(lat_f + lat_i)/2);
+        y = M_PI/180*(lat_f - lat_i);
+        return sqrt(x*x + y*y)*6371007.1810;
     }
 
     unsigned long int binary_search ( node nodes_inf[], unsigned long int size_nodes, unsigned long int searched_node )
